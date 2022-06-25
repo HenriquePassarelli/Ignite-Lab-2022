@@ -1,7 +1,8 @@
 import { DefaultUi, Player, Youtube } from "@vime/react"
 import { CaretRight, DiscordLogo, FileArrowDown, Lightning } from "phosphor-react"
-import '@vime/core/themes/default.css'
 import { gql, useQuery } from "@apollo/client"
+import { useParams } from "react-router-dom"
+import '@vime/core/themes/default.css'
 
 const GET_LESSONS_BY_SLUG_QUERY = gql`
     query GetLessonBySlug($slug: String) {
@@ -29,20 +30,21 @@ interface IGetLessonQueryResponse {
         }
     }
 }
-interface ILessonSlug {
-    lessonSlug: string
-}
 
-export const Video = (props: ILessonSlug) => {
+
+export const Video = () => {
+    const { slug } = useParams<{ slug: string }>()
+
     const { data } = useQuery<IGetLessonQueryResponse>(GET_LESSONS_BY_SLUG_QUERY, {
         variables: {
-            slug: props.lessonSlug
-        }
+            slug: slug
+        },
+        fetchPolicy: "no-cache",
     })
 
     if (!data) {
         return (
-            <div className="flex-1">
+            <div className="flex-1 h-full w-full flex items-center justify-center">
                 <p>Carregando...</p>
             </div>
         )

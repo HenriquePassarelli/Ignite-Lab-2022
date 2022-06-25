@@ -1,6 +1,6 @@
 import { ApolloClient, DefaultOptions, InMemoryCache } from '@apollo/client'
 
-const defaultOptions: DefaultOptions = {
+export const defaultOptions: DefaultOptions = {
     watchQuery: {
         fetchPolicy: "no-cache",
         errorPolicy: "ignore"
@@ -13,6 +13,8 @@ const defaultOptions: DefaultOptions = {
 
 export const client = new ApolloClient({
     uri: import.meta.env.VITE_API_URL,
-    cache: new InMemoryCache(),
-    defaultOptions
+    headers: {
+        'Authorization': `Bearer  ${import.meta.env.VITE_API_ACCES_TOKEN}`
+    },
+    cache: new InMemoryCache()
 })
