@@ -3,46 +3,19 @@ import { CaretRight, DiscordLogo, FileArrowDown, Lightning } from "phosphor-reac
 import { gql, useQuery } from "@apollo/client"
 import { useParams } from "react-router-dom"
 import '@vime/core/themes/default.css'
-
-const GET_LESSONS_BY_SLUG_QUERY = gql`
-    query GetLessonBySlug($slug: String) {
-        lesson(where: {slug: $slug}) {
-            title
-            description
-            videoId
-            teacher {
-                avatarURL
-                bio
-                name
-            }
-        }
-    }
-`
-interface IGetLessonQueryResponse {
-    lesson: {
-        title: string
-        videoId: string
-        description: string
-        teacher: {
-            bio: string
-            avatarURL: string
-            name: string
-        }
-    }
-}
-
+import { useGetLessonBySlugQuery } from "../graphql/generated"
 
 export const Video = () => {
     const { slug } = useParams<{ slug: string }>()
 
-    const { data } = useQuery<IGetLessonQueryResponse>(GET_LESSONS_BY_SLUG_QUERY, {
+    const { data } = useGetLessonBySlugQuery({
         variables: {
             slug: slug
         },
         fetchPolicy: "no-cache",
     })
 
-    if (!data) {
+    if (!data || !data.lesson) {
         return (
             <div className="flex-1 h-full w-full flex items-center justify-center">
                 <p>Carregando...</p>
@@ -67,24 +40,26 @@ export const Video = () => {
                         <p className="mt-4 text-gray-200 leading-relaxed">
                             {data.lesson.description}
                         </p>
-                        <div className="flex items-center gap-4 mt-6">
-                            <img
-                                className="h-16 w-16 rounded-full border-2 border-blue-500"
-                                src={data.lesson.teacher.avatarURL}
-                                alt=""
-                            />
-                            <div className="leading-relaxed">
-                                <strong className="font-bold text=2xl block">{data.lesson.teacher.name}</strong>
-                                <span className="text-gray-200 text-sm block">{data.lesson.teacher.bio}</span>
+                        {data.lesson.teacher && (
+                            <div className="flex items-center gap-4 mt-6">
+                                <img
+                                    className="h-16 w-16 rounded-full border-2 border-blue-500"
+                                    src={data.lesson.teacher.avatarURL}
+                                    alt=""
+                                />
+                                <div className="leading-relaxed">
+                                    <strong className="font-bold text=2xl block">{data.lesson.teacher.name}</strong>
+                                    <span className="text-gray-200 text-sm block">{data.lesson.teacher.bio}</span>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                     <div className="flex flex-col gap-4">
-                        <a href="" className="p-4 text-sm bg-green-500 flex items-center rounded font-bold uppercase gap-2 justify-center hover:bg-green-700 transition-colors">
+                        <a href="#" className="p-4 text-sm bg-green-500 flex items-center rounded font-bold uppercase gap-2 justify-center hover:bg-green-700 transition-colors">
                             <DiscordLogo size={24} />
                             Comunidade no discord
                         </a>
-                        <a href="" className="p-4 text-sm border border-blue-500 text-blue-500 flex items-center rounded font-bold uppercase gap-2 justify-center hover:bg-blue-500 hover:text-gray-900 transition-colors">
+                        <a href="#" className="p-4 text-sm border border-blue-500 text-blue-500 flex items-center rounded font-bold uppercase gap-2 justify-center hover:bg-blue-500 hover:text-gray-900 transition-colors">
                             <Lightning size={24} />
                             Acesse o desafio
                         </a>
